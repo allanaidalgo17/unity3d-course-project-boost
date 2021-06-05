@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    private Rigidbody rb;
-
     [SerializeField] private float thrustSpeed = 1;
     [SerializeField] private float rotationSpeed = 1;
+    [SerializeField] private AudioClip mainEngine;
+    [SerializeField] private ParticleSystem mainEngineParticles;
+    [SerializeField] private ParticleSystem leftEngineParticles;
+    [SerializeField] private ParticleSystem rightEngineParticles;
+
+    private Rigidbody rb;
+    private AudioSource audioSource;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -26,7 +33,21 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.PlayOneShot(mainEngine);
+            }
+            if (!mainEngineParticles.isPlaying)
+            {
+                mainEngineParticles.Play();
+            }
+
             rb.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
+        }
+        else
+        {
+            audioSource.Stop();
+            mainEngineParticles.Stop();
         }
     }
 
@@ -35,11 +56,24 @@ public class Movement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
+            if (!rightEngineParticles.isPlaying)
+            {
+                rightEngineParticles.Play();
+            }
             ApplyRotation(rotationSpeed);
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
+            if (!leftEngineParticles.isPlaying)
+            {
+                leftEngineParticles.Play();
+            }
             ApplyRotation(-rotationSpeed);
+        }
+        else
+        {
+            rightEngineParticles.Stop();
+            leftEngineParticles.Stop();
         }
     }
 
