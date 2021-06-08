@@ -12,29 +12,45 @@ public class CollisionHandler : MonoBehaviour
     [SerializeField] private ParticleSystem successParticles;
 
     private AudioSource audioSource;
-
     private bool isTransitioning = false;
+    private bool isCollisionDisabled = false;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
+    private void Update()
+    {
+        HandleDebugCommands();
+    }
+
+    private void HandleDebugCommands()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextScene();
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            isCollisionDisabled = !isCollisionDisabled;     // toggle variable
+        }
+    }
+
     private void OnCollisionEnter(Collision other)
     {
-        if (!isTransitioning)
+        if (isTransitioning || isCollisionDisabled) { return; }
+
+        switch (other.gameObject.tag)
         {
-            switch (other.gameObject.tag)
-            {
-                case "Friendly":
-                    break;
-                case "Finish":
-                    StartSuccessSequence();
-                    break;
-                default:
-                    StartCrashSequence();
-                    break;
-            }
+            case "Friendly":
+                break;
+            case "Finish":
+                StartSuccessSequence();
+                break;
+            default:
+                StartCrashSequence();
+                break;
         }
     }
 

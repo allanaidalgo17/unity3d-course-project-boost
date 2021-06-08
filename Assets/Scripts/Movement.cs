@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,16 +34,7 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            if (!audioSource.isPlaying)
-            {
-                audioSource.PlayOneShot(mainEngine);
-            }
-            if (!mainEngineParticles.isPlaying)
-            {
-                mainEngineParticles.Play();
-            }
-
-            rb.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
+            StartThrusting();
         }
         else
         {
@@ -51,29 +43,58 @@ public class Movement : MonoBehaviour
         }
     }
 
+    private void StartThrusting()
+    {
+        PlayAudio(mainEngine);
+
+        PlayParticles(mainEngineParticles);
+
+        rb.AddRelativeForce(Vector3.up * thrustSpeed * Time.deltaTime);
+    }
+
     private void ProcessRotation()
     {
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if (!rightEngineParticles.isPlaying)
-            {
-                rightEngineParticles.Play();
-            }
-            ApplyRotation(rotationSpeed);
+            StartRotatingLeft();
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (!leftEngineParticles.isPlaying)
-            {
-                leftEngineParticles.Play();
-            }
-            ApplyRotation(-rotationSpeed);
+            StartRotatingRight();
         }
         else
         {
             rightEngineParticles.Stop();
             leftEngineParticles.Stop();
+        }
+    }
+
+    private void StartRotatingRight()
+    {
+        PlayParticles(leftEngineParticles);
+        ApplyRotation(-rotationSpeed);
+    }
+
+    private void StartRotatingLeft()
+    {
+        PlayParticles(rightEngineParticles);
+        ApplyRotation(rotationSpeed);
+    }
+
+    private void PlayAudio(AudioClip audioClip)
+    {
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(audioClip);
+        }
+    }
+
+    private void PlayParticles(ParticleSystem particleSystem)
+    {
+        if (!particleSystem.isPlaying)
+        {
+            particleSystem.Play();
         }
     }
 
